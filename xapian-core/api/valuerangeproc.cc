@@ -454,16 +454,16 @@ static const unsigned int size_map[26] = {
 static unsigned int
 get_size_multiplier_from_suffix(const char ch)
 {
-	// It takes character as input and return number of bytes
-	// B - 1 byte
-	// K - 1024 bytes
-	// M - 1024*1024 bytes
-	// G - 1024*1024*1024 bytes
-	if (ch >= 'A' && ch <= 'Z') {
+    // It takes character as input and return number of bytes
+    // B - 1 byte
+    // K - 1024 bytes
+    // M - 1024*1024 bytes
+    // G - 1024*1024*1024 bytes
+    if (ch >= 'A' && ch <= 'Z') {
 		return size_map[ch - 'A'];
-	} else {
+    } else {
 		return 0;
-	}
+    }
 }
 
 Xapian::Query

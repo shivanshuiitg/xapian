@@ -460,40 +460,40 @@ get_size_multiplier_from_suffix(const char ch)
     // M - 1024*1024 bytes
     // G - 1024*1024*1024 bytes
     if (ch >= 'A' && ch <= 'Z') {
-		return size_map[ch - 'A'];
+	return size_map[ch - 'A'];
     } else {
-		return 0;
+	return 0;
     }
 }
 
 Xapian::Query
 FileSizeRangeProcessor::operator()(const string& b, const string& e) {
 	// Here b and e will be like "100K" and "1M"
-	double size_b, size_e;
-	char unit_b = '\0', unit_e = '\0';
-	string temp_b = b, temp_e = e;
+    double size_b, size_e;
+    char unit_b = '\0', unit_e = '\0';
+    string temp_b = b, temp_e = e;
 
-	if (!b.empty()) {
-		errno = 0;
-		char b_back = b.back();
-		if (b_back =='B' || b_back =='K' || b_back =='M' || b_back =='G') {
-			// If suffix of b is 'B','K','M','G'
-			unit_b = b_back;
-			temp_b.pop_back();
-		} else if (!C_isdigit(b_back)) {
-			// If it is neither digit nor any of above character, then it is invalid
-			goto not_our_range;
-		}
-		const char * startptr = temp_b.c_str();
-		char * endptr;
-		size_b = strtod(startptr, &endptr);
-		if (endptr != startptr + temp_b.size() || errno) {
-			// Invalid characters in string || overflow or underflow.
-			goto not_our_range;
-		}
-	} else {
-		size_b = 0.0;
+    if (!b.empty()) {
+	errno = 0;
+	char b_back = b.back();
+	if (b_back =='B' || b_back =='K' || b_back =='M' || b_back =='G') {
+	// If suffix of b is 'B','K','M','G'
+	    unit_b = b_back;
+	    temp_b.pop_back();
+	} else if (!C_isdigit(b_back)) {
+	// If it is neither digit nor any of above character, then it is invalid
+	    goto not_our_range;
 	}
+	const char * startptr = temp_b.c_str();
+	char * endptr;
+	size_b = strtod(startptr, &endptr);
+	if (endptr != startptr + temp_b.size() || errno) {
+	// Invalid characters in string || overflow or underflow.
+	    goto not_our_range;
+	}
+    } else {
+		size_b = 0.0;
+    }
 
 	if (!e.empty()) {
 		errno = 0;

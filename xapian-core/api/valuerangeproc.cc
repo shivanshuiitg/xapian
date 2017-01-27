@@ -495,46 +495,46 @@ FileSizeRangeProcessor::operator()(const string& b, const string& e) {
 		size_b = 0.0;
     }
 
-	if (!e.empty()) {
-		errno = 0;
-		char e_back = e.back();
-		if (e_back =='B' || e_back =='K' || e_back =='M' || e_back =='G') {
-			// If suffix of b is 'B','K','M','G'
-			unit_e = e_back;
-			temp_e.pop_back();
-		} else if(!C_isdigit(e_back)) {
-			// If it is neither digit nor any of above character, then it is invalid
-		    goto not_our_range;
-		}
-		const char * startptr = temp_e.c_str();
-		char * endptr;
-		size_e = strtod(startptr, &endptr);
-		if (endptr != startptr + temp_e.size() || errno) {
-			// Invalid characters in string || overflow or underflow.
-			goto not_our_range;
-		}
-	} else {
-		size_e = 0.0;
+    if (!e.empty()) {
+	errno = 0;
+	char e_back = e.back();
+	if (e_back =='B' || e_back =='K' || e_back =='M' || e_back =='G') {
+	    // If suffix of b is 'B','K','M','G'
+	    unit_e = e_back;
+	    temp_e.pop_back();
+	} else if(!C_isdigit(e_back)) {
+	    // If it is neither digit nor any of above character, then it is invalid
+	    goto not_our_range;
 	}
-	if (unit_e == '\0' && unit_b == '\0'){
-		// If 10..20 then it means 10 to 20 bytes
-		unit_b = 'B';
-		unit_e = 'B';
+	const char * startptr = temp_e.c_str();
+	char * endptr;
+	size_e = strtod(startptr, &endptr);
+	if (endptr != startptr + temp_e.size() || errno) {
+	    // Invalid characters in string || overflow or underflow.
+	    goto not_our_range;
 	}
-	if (unit_e == '\0') {
-		// 1M..5 is not valid. So, if e does not have unit, then invalid
-		goto not_our_range;
-	}
-	if (unit_b == '\0') {
-		unit_b = unit_e;
-	}
+    } else {
+	size_e = 0.0;
+    }
+    if (unit_e == '\0' && unit_b == '\0'){
+	// If 10..20 then it means 10 to 20 bytes
+	unit_b = 'B';
+	unit_e = 'B';
+    }
+    if (unit_e == '\0') {
+        // 1M..5 is not valid. So, if e does not have unit, then invalid
+	goto not_our_range;
+    }
+    if (unit_b == '\0') {
+	unit_b = unit_e;
+    }
 
-	size_b = size_b * get_size_multiplier_from_suffix(unit_b);
-	size_e = size_e * get_size_multiplier_from_suffix(unit_e);
+    size_b = size_b * get_size_multiplier_from_suffix(unit_b);
+    size_e = size_e * get_size_multiplier_from_suffix(unit_e);
 
-	return RangeProcessor::operator()(
-	    b.empty() ? b : Xapian::sortable_serialise(size_b),
-	    e.empty() ? e : Xapian::sortable_serialise(size_e));
+    return RangeProcessor::operator()(
+	b.empty() ? b : Xapian::sortable_serialise(size_b),
+	e.empty() ? e : Xapian::sortable_serialise(size_e));
 
 not_our_range:
     return Xapian::Query(Xapian::Query::OP_INVALID);
